@@ -1,0 +1,3 @@
+aiosqlite
+fluxer-py
+python-dotenv
