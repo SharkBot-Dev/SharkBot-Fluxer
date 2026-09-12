@@ -30,6 +30,41 @@ class SharkBot(fluxer.Bot):
             """
         )
 
+        # Automod
+        await self.CURSUR.execute(
+            """
+            CREATE TABLE IF NOT EXISTS automod (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                guild_id TEXT NOT NULL,
+                automod_id TEXT NOT NULL
+            )
+            """
+        )
+
+        # 警告
+        await self.CURSUR.execute(
+            """
+            CREATE TABLE IF NOT EXISTS warns (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                guild_id TEXT NOT NULL,
+                user_id TEXT NOT NULL,
+                count INTEGER NOT NULL
+            )
+            """
+        )
+
+        # 警告と処罰
+        await self.CURSUR.execute(
+            """
+            CREATE TABLE IF NOT EXISTS punishments (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                guild_id TEXT NOT NULL,
+                action TEXT NOT NULL,
+                count INTEGER NOT NULL
+            )
+            """
+        )
+
 bot = SharkBot()
 
 async def load_extensions():

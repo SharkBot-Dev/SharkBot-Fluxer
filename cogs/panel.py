@@ -51,7 +51,7 @@ class PanelCog(fluxer.Cog):
             emoji_to_role_id = json.loads(setting[2])
             emoji_to_role_id[emoji] = role_id
 
-            await self.bot.CURSUR.execute("UPDATE rolepanels SET emoji_to_roles = ?", (json.dumps(emoji_to_role_id),))
+            await self.bot.CURSUR.execute("UPDATE rolepanels SET emoji_to_roles = ? WHERE message_id = ?", (json.dumps(emoji_to_role_id), str(message.id)))
             await self.bot.DB.commit()
 
     @fluxer.Cog.listener(name="on_raw_reaction_add")
