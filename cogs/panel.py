@@ -99,3 +99,6 @@ class PanelCog(fluxer.Cog):
 
 async def setup(bot: fluxer.Bot):
     await bot.add_cog(PanelCog(bot))
+
+async def teardown(bot: fluxer.Bot):
+    await bot.remove_cog(PanelCog(bot).__class__.__name__)

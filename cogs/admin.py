@@ -37,3 +37,6 @@ class AdminCog(fluxer.Cog):
 
 async def setup(bot: fluxer.Bot):
     await bot.add_cog(AdminCog(bot))
+
+async def teardown(bot: fluxer.Bot):
+    await bot.remove_cog(AdminCog(bot).__class__.__name__)
