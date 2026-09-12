@@ -25,8 +25,7 @@ class HelpCog(fluxer.Cog):
 
     @fluxer.Cog.command(name="help")
     async def help_command(self, msg: fluxer.Message):
-        message = await msg.reply(embed=fluxer.Embed(title="SharkBotのヘルプ", description="""
-"""))
+        message = await msg.reply(embed=self.build_embed("🏠"))
         self.HELP_SESSIONS.append(message.id)
 
         await message.add_reaction("🏠")
