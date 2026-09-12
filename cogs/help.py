@@ -14,11 +14,28 @@ class HelpCog(fluxer.Cog):
 `!.rp add <message_id> <emoji> <role_id>`
 ロールパネルにロールを追加します。
 """)
+        elif emoji == "🔨":
+            embed = fluxer.Embed(title="AutoMod", description="""`!.automod create <automod_id>`
+AutoModを作成します。
+
+`!.automod delete <automod_id>`
+AutoModを削除します。
+
+`!.automod punishment <count> <action>`
+<count>回目に処罰された場合、<action>を実行するように設定します。
+> 現在は、`send_message`, `none`が<action>に指定できます。
+
+`!.automod punishments`
+処罰回数リストを表示します。
+
+> <automod_id>には、現在`invite`が指定できます。
+""")
         else:
             embed = fluxer.Embed(title="SharkBotのヘルプ", description="""`!.help (引数なし)`
 このメッセージを表示します。
 
 👜 ロールパネルを作成するコマンドを知ります。
+🔨 AutoModや、処罰関連の設定をするコマンドを知ります。
 """)
 
         if is_edit:
@@ -33,6 +50,7 @@ class HelpCog(fluxer.Cog):
 
         await message.add_reaction("🏠")
         await message.add_reaction("👜")
+        await message.add_reaction("🔨")
 
     @fluxer.Cog.listener(name="on_raw_reaction_add")
     async def on_raw_reaction_add_help(self, reaction_info: fluxer.models.reaction.RawReactionActionEvent):

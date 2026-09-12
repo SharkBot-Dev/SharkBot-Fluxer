@@ -8,7 +8,7 @@ class AutoModCog(fluxer.Cog):
         super().__init__(bot)
 
         self.AUTOMOD_IDS = ["invite"]
-        self.ACTION_IDS = ["send_message"]
+        self.ACTION_IDS = ["none", "send_message"]
         self.INVITE_RE = re.compile(r"fluxer\.gg/.+")
 
     @fluxer.Cog.command(name="automod")
