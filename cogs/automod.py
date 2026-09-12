@@ -87,6 +87,8 @@ class AutoModCog(fluxer.Cog):
             rows = await self.bot.CURSUR.fetchall()
             text = ""
             for r in sorted(rows):
+                if r[1] == "none":
+                    continue
                 text += f"{r[0]}回目: {r[1]}\n"
             await msg.reply(embed=fluxer.Embed(description=text, title="何回目の警告で何をするか"))
 
