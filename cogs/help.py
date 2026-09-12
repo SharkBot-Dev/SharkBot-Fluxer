@@ -6,7 +6,7 @@ class HelpCog(fluxer.Cog):
 
         self.HELP_SESSIONS = []
 
-    def build_embed(self, emoji: str):
+    def build_embed(self, emoji: str, is_edit: bool):
         if emoji == "👜":
             embed = fluxer.Embed(title="ロールパネル", description="""`!.rp create <title> <emoji> <role_id>`
 ロールパネルを作成します。
@@ -21,11 +21,14 @@ class HelpCog(fluxer.Cog):
 👜 ロールパネルを作成するコマンドを知ります。
 """)
 
+        if is_edit:
+            embed = embed.to_dict()
+
         return embed
 
     @fluxer.Cog.command(name="help")
     async def help_command(self, msg: fluxer.Message):
-        message = await msg.reply(embed=self.build_embed("🏠"))
+        message = await msg.reply(embed=self.build_embed("🏠", False))
         self.HELP_SESSIONS.append(message.id)
 
         await message.add_reaction("🏠")
@@ -44,10 +47,10 @@ class HelpCog(fluxer.Cog):
         channel = await self.bot.fetch_channel(reaction_info.channel_id)
         message = await channel.fetch_message(reaction_info.message_id)
 
-        embed = self.build_embed(emoji)
+        embed = self.build_embed(emoji, True)
         await message.edit(embeds=[embed])
 
-        await message.remove_reaction(reaction_info.emoji, reaction_info.user_id)
+        await message.remove_reaction(emoji, reaction_info.user_id)
 
 async def setup(bot: fluxer.Bot):
     await bot.add_cog(HelpCog(bot))
