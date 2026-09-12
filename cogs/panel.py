@@ -55,7 +55,7 @@ class PanelCog(fluxer.Cog):
             await self.bot.DB.commit()
 
     @fluxer.Cog.listener(name="on_raw_reaction_add")
-    async def on_raw_reaction_add(self, reaction_info: fluxer.models.reaction.RawReactionActionEvent):
+    async def on_raw_reaction_add_rp(self, reaction_info: fluxer.models.reaction.RawReactionActionEvent):
         # print(reaction_info)
 
         await self.bot.CURSUR.execute("SELECT channel_id, message_id, emoji_to_roles FROM rolepanels WHERE channel_id = ? AND message_id = ?", (str(reaction_info.channel_id), str(reaction_info.message_id),))
@@ -64,6 +64,9 @@ class PanelCog(fluxer.Cog):
         # print(setting)
 
         if not setting:
+            return
+
+        if reaction_info.user_id == self.bot.user.id:
             return
 
         guild_id = str(reaction_info.guild_id)
