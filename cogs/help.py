@@ -28,6 +28,9 @@ AutoModを削除します。
 `!.automod punishments`
 処罰回数リストを表示します。
 
+`!.clear_warn <user_id>`
+警告をクリアします。
+
 > <automod_id>には、現在`invite`が指定できます。
 """)
         else:
