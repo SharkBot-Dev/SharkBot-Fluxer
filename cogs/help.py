@@ -33,12 +33,20 @@ AutoModを削除します。
 
 > <automod_id>には、現在`invite`が指定できます。
 """)
+        elif emoji == "😆":
+            embed = fluxer.Embed(title="楽しい", description="""`!.fox`
+狐の画像を表示します。
+
+`!.choyen <top> <down>`
+5000兆円ほしい！を生成します。
+""")
         else:
             embed = fluxer.Embed(title="SharkBotのヘルプ", description="""`!.help (引数なし)`
 このメッセージを表示します。
 
 👜 ロールパネルを作成するコマンドを知ります。
 🔨 AutoModや、処罰関連の設定をするコマンドを知ります。
+😆 面白い機能とコマンドを知ります。
 """)
 
         if is_edit:
@@ -54,6 +62,7 @@ AutoModを削除します。
         await message.add_reaction("🏠")
         await message.add_reaction("👜")
         await message.add_reaction("🔨")
+        await message.add_reaction("😆")
 
     @fluxer.Cog.listener(name="on_raw_reaction_add")
     async def on_raw_reaction_add_help(self, reaction_info: fluxer.models.reaction.RawReactionActionEvent):
