@@ -31,7 +31,7 @@ AutoModを削除します。
 `!.clear_warn <user_id>`
 警告をクリアします。
 
-> <automod_id>には、現在`invite`が指定できます。
+> <automod_id>には、現在`invite` `discord_invite`が指定できます。
 """)
         elif emoji == "😆":
             embed = fluxer.Embed(title="楽しい", description="""`!.fox`

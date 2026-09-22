@@ -1,3 +1,4 @@
+import asyncio
 import json
 import re
 
@@ -7,9 +8,10 @@ class AutoModCog(fluxer.Cog):
     def __init__(self, bot: fluxer.Bot):
         super().__init__(bot)
 
-        self.AUTOMOD_IDS = ["invite"]
+        self.AUTOMOD_IDS = ["invite", "discord_invite"]
         self.ACTION_IDS = ["none", "send_message"]
         self.INVITE_RE = re.compile(r"fluxer\.gg/.+")
+        self.DISCORD_INVITE_RE = re.compile(r"(discord\.(gg|com/invite|app\.com/invite)[/\\][\w-]+)")
 
     @fluxer.Cog.command(name="automod")
     @fluxer.has_permission(fluxer.Permissions.MANAGE_GUILD)
@@ -139,11 +141,7 @@ class AutoModCog(fluxer.Cog):
         if action == "send_message":
             await message.channel.send(embed=fluxer.Embed(description=f"{message.author.mention}が{memo}ため、処罰されました。\n\nこれは{count}回目の警告です。"))
 
-    @fluxer.Cog.listener(name="on_message")
-    async def on_message_automod(self, message: fluxer.Message):
-        if message.author.id == self.bot.user.id:
-            return
-
+    async def process_invite(self, message: fluxer.Message):
         await self.bot.CURSUR.execute("SELECT guild_id, automod_id FROM automod WHERE guild_id = ? AND automod_id = ?", (str(message.guild_id), str("invite"),))
         setting = await self.bot.CURSUR.fetchone()
         if not setting:
@@ -161,6 +159,41 @@ class AutoModCog(fluxer.Cog):
                 return
 
             await self.execute_punishment_message(message, setting[1], "招待リンクを送信した", count)
+
+            return True
+
+    async def process_discord_invite(self, message: fluxer.Message):
+        await self.bot.CURSUR.execute("SELECT guild_id, automod_id FROM automod WHERE guild_id = ? AND automod_id = ?", (str(message.guild_id), str("discord_invite"),))
+        setting = await self.bot.CURSUR.fetchone()
+        if not setting:
+            return
+
+        check = self.DISCORD_INVITE_RE.search(message.content)
+        if check:
+            await message.delete()
+
+            count = await self.warn(str(message.guild_id), str(message.author.id))
+
+            await self.bot.CURSUR.execute("SELECT count, action, guild_id FROM punishments WHERE guild_id = ? AND count = ?", (str(message.guild_id), count,))
+            setting = await self.bot.CURSUR.fetchone()
+            if not setting:
+                return
+
+            await self.execute_punishment_message(message, setting[1], "Discord招待リンクを送信した", count)
+
+            return True
+
+    @fluxer.Cog.listener(name="on_message")
+    async def on_message_automod_invite(self, message: fluxer.Message):
+        if message.author.id == self.bot.user.id:
+            return
+
+        invite = await self.process_invite(message)
+        if invite:
+            return
+        discord_invite = await self.process_discord_invite(message)
+        if discord_invite:
+            return
 
 async def setup(bot: fluxer.Bot):
     await bot.add_cog(AutoModCog(bot))
