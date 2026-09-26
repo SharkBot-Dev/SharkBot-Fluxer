@@ -3,11 +3,14 @@ import fluxer
 from fluxer.gateway import GatewayPayload
 from fluxer.enums import GatewayOpcode
 
+import asyncio
+
 class BadgeCog(fluxer.Cog):
     def __init__(self, bot: fluxer.Bot):
         super().__init__(bot)
 
-    async def cog_load(self):
+    @fluxer.Cog.listener("on_ready")
+    async def on_ready(self):
         await self.bot._gateway._send(
             GatewayPayload(
                 op=GatewayOpcode.PRESENCE_UPDATE,
