@@ -10,8 +10,12 @@ class PanelCog(fluxer.Cog):
     @fluxer.has_permission(fluxer.Permissions.MANAGE_ROLES)
     async def role_panel(self, msg: fluxer.Message):
         split_message = msg.content.split()
-        if len(split_message) < 4:
-            await msg.reply("使用方法:\n`!.rp create <title> <emoji> <role_id>`\n`!.rp add <message_id> <emoji> <role_id>`")
+        if len(split_message) < 3:
+            await msg.reply("""使用方法:
+`!.rp create <title> <emoji> <role_id>`
+`!.rp add <message_id> <emoji> <role_id>`
+`!.rp remove <message_id> <role_id>`
+""")
             return
 
         sub_command_name = split_message[1]
@@ -28,6 +32,8 @@ class PanelCog(fluxer.Cog):
 
             await self.bot.CURSUR.execute("INSERT INTO rolepanels (channel_id, message_id, emoji_to_roles) VALUES (?, ?, ?)", (str(msg.channel_id), str(message.id), json.dumps({emoji: role_id})))
             await self.bot.DB.commit()
+
+            await msg.add_reaction("✅️")
         elif sub_command_name == "add":
             message_id = split_message[2]
             await self.bot.CURSUR.execute("SELECT channel_id, message_id, emoji_to_roles FROM rolepanels WHERE channel_id = ? AND message_id = ?", (str(msg.channel_id), str(message_id),))
@@ -53,6 +59,50 @@ class PanelCog(fluxer.Cog):
 
             await self.bot.CURSUR.execute("UPDATE rolepanels SET emoji_to_roles = ? WHERE message_id = ?", (json.dumps(emoji_to_role_id), str(message.id)))
             await self.bot.DB.commit()
+
+            await msg.reply("追加しました。")
+        elif sub_command_name == "remove":
+            message_id = split_message[2]
+            await self.bot.CURSUR.execute("SELECT channel_id, message_id, emoji_to_roles FROM rolepanels WHERE channel_id = ? AND message_id = ?", (str(msg.channel_id), str(message_id),))
+            setting = await self.bot.CURSUR.fetchone()
+            if not setting:
+                await msg.reply("不明なロールパネルです。\n`!.rp create`コマンドで作に作成してください。")
+                return
+
+            role_id = split_message[3]
+
+            emoji = ""
+            emoji_to_role_id = json.loads(setting[2])
+            for key, value in emoji_to_role_id.items():
+                if value == role_id:
+                    emoji = key
+
+            if not emoji:
+                await msg.reply("不明なロールです。")
+                return
+
+            try:
+                message = await msg.channel.fetch_message(int(message_id))
+                embed = message.embeds[0].copy()
+                description = embed["description"].split("\n")
+                new_description = ""
+                for desc in description:
+                    if f"<@&{role_id}>" in desc:
+                        continue
+                    new_description += desc
+                embed["description"] = new_description
+                await message.edit(embeds=[embed])
+                await message.remove_reaction(emoji)
+            except Exception as e:
+                print(e)
+                return
+
+            del emoji_to_role_id[emoji]
+
+            await self.bot.CURSUR.execute("UPDATE rolepanels SET emoji_to_roles = ? WHERE message_id = ?", (json.dumps(emoji_to_role_id), str(message.id)))
+            await self.bot.DB.commit()
+
+            await msg.reply("削除しました。")
 
     @fluxer.Cog.listener(name="on_raw_reaction_add")
     async def on_raw_reaction_add_rp(self, reaction_info: fluxer.models.reaction.RawReactionActionEvent):
