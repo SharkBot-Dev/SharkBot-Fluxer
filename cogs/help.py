@@ -13,6 +13,9 @@ class HelpCog(fluxer.Cog):
 
 `!.rp add <message_id> <emoji> <role_id>`
 ロールパネルにロールを追加します。
+
+`!.rp remove <message_id> <role_id>`
+ロールパネルからロールを削除します。
 """)
         elif emoji == "🔨":
             embed = fluxer.Embed(title="AutoMod", description="""`!.automod create <automod_id>`

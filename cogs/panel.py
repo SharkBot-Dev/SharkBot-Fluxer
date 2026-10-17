@@ -1,3 +1,4 @@
+import asyncio
 import json
 
 import fluxer
@@ -26,14 +27,14 @@ class PanelCog(fluxer.Cog):
             try:
                 message = await msg.channel.send(embed=fluxer.Embed(title=title, description=f"{emoji} <@&{role_id}>"))
                 await message.add_reaction(emoji)
+
+                await msg.channel.send(embed=fluxer.Embed(title="💡ヒント", description=f"ロールをさらに追加する際は、\n`!.rp add {message.id} <emoji> <role_id>`\nで追加できます。"))
             except Exception as e:
                 await msg.reply("エラー！")
                 return
 
             await self.bot.CURSUR.execute("INSERT INTO rolepanels (channel_id, message_id, emoji_to_roles) VALUES (?, ?, ?)", (str(msg.channel_id), str(message.id), json.dumps({emoji: role_id})))
             await self.bot.DB.commit()
-
-            await msg.add_reaction("✅️")
         elif sub_command_name == "add":
             message_id = split_message[2]
             await self.bot.CURSUR.execute("SELECT channel_id, message_id, emoji_to_roles FROM rolepanels WHERE channel_id = ? AND message_id = ?", (str(msg.channel_id), str(message_id),))
